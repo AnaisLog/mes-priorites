@@ -7,6 +7,11 @@ const NAVY = "#1E3A45";
 const TEAL = "#2FAFA6";
 const CORAL = "#E8734A";
 const CREAM = "#FBF7F1";
+// Bleu azur du logo, utilisé pour le fond de page.
+const AZURE_BG = "#1C93A0";
+// Textes posés directement sur le fond azur (hors des cartes blanches).
+const ON_AZURE_TEXT = "#FFFFFF";
+const ON_AZURE_MUTED = "#D9F3F0";
 
 const QUADRANTS = {
   "1-1": { key: "faire", label: "Faire", emoji: "🔥", sub: "important · urgent", color: CORAL, bg: "#FCE8DF" },
@@ -94,7 +99,7 @@ export default function App() {
 
   const shell = {
     minHeight: "100vh",
-    background: CREAM,
+    background: AZURE_BG,
     fontFamily: "'Poppins', sans-serif",
     color: NAVY,
   };
@@ -147,21 +152,21 @@ export default function App() {
           <div className="flex items-center gap-3">
             <img src={logo} alt="Logo" className="h-10" />
             <div>
-              <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 800, color: NAVY }} className="text-2xl sm:text-3xl">
+              <h1 style={{ fontFamily: "'Poppins', sans-serif", fontWeight: 800, color: ON_AZURE_TEXT }} className="text-2xl sm:text-3xl">
                 Priorités
               </h1>
-              <p className="text-xs sm:text-sm" style={{ color: TEAL, fontWeight: 600 }}>
+              <p className="text-xs sm:text-sm" style={{ color: ON_AZURE_MUTED, fontWeight: 600 }}>
                 Une chose à la fois, tu gères 💪
               </p>
             </div>
           </div>
-          <button onClick={logout} className="text-sm underline decoration-dotted shrink-0" style={{ color: "#7C8A90" }}>
+          <button onClick={logout} className="text-sm underline decoration-dotted shrink-0" style={{ color: ON_AZURE_MUTED }}>
             {identifiant} · changer
           </button>
         </div>
 
         {storageWarning && (
-          <p className="mt-3 text-xs" style={{ color: "#D9A441" }}>
+          <p className="mt-3 text-xs" style={{ color: "#FFE8B8" }}>
             ⚠️ La sauvegarde locale n'a pas pu être confirmée — tes tâches
             restent visibles ici mais pourraient ne pas être conservées après
             fermeture de l'onglet.
@@ -265,8 +270,8 @@ function AxisLabel({ children, vertical }) {
       className={vertical ? "flex items-center justify-end pr-1 text-right" : "flex items-end justify-center pb-1"}
       style={{
         fontFamily: "'Poppins', sans-serif",
-        color: "#7C8A90",
-        fontWeight: 600,
+        color: ON_AZURE_MUTED,
+        fontWeight: 700,
         fontSize: "0.8rem",
         writingMode: vertical ? "vertical-rl" : "horizontal-tb",
         transform: vertical ? "rotate(180deg)" : "none",
