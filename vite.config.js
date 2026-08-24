@@ -8,5 +8,5 @@ import react from "@vitejs/plugin-react";
 // alors base doit être "/mes-priorites/"
 export default defineConfig({
   plugins: [react()],
-  base: "/matrice-eisenhower/",
+  base: "/mes-priorites/",
 });
