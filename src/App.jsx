@@ -16,8 +16,8 @@ const ON_AZURE_MUTED = "#D9F3F0";
 const QUADRANTS = {
   "1-1": { key: "faire", label: "Faire", emoji: "🔥", sub: "important · urgent", color: CORAL, bg: "#FCE8DF" },
   "1-0": { key: "planifier", label: "Planifier", emoji: "🗓️", sub: "important · pas urgent", color: TEAL, bg: "#E1F3F1" },
-  "0-1": { key: "deleguer", label: "Déléguer", emoji: "🤝", sub: "pas important · urgent", color: "#D9A441", bg: "#FBF0DC" },
-  "0-0": { key: "eliminer", label: "Éliminer", emoji: "🗑️", sub: "pas important · pas urgent", color: "#8A97A0", bg: "#EEF1F2" },
+  "0-1": { key: "deleguer", label: "Reporter ou déléguer", emoji: "🤝", sub: "pas important · urgent", color: "#D9A441", bg: "#FBF0DC" },
+  "0-0": { key: "eliminer", label: "Se rappeler ou supprimer", emoji: "🗑️", sub: "pas important · pas urgent", color: "#8A97A0", bg: "#EEF1F2" },
 };
 
 function quadrantOf(t) {
