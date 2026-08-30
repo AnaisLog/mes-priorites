@@ -1,4 +1,6 @@
 import { useState, useRef } from "react";
+import { doc, getDoc, setDoc } from "firebase/firestore";
+import { db, ensureSignedIn } from "./firebase";
 import logo from "./assets/logo.png";
 
 // Palette inspirée du logo Anaïs Logerais (bleu nuit / turquoise)
@@ -24,8 +26,9 @@ function quadrantOf(t) {
   return QUADRANTS[`${t.important ? 1 : 0}-${t.urgent ? 1 : 0}`];
 }
 
-function storageKeyFor(id) {
-  return `matrice-eisenhower:taches:${id.toLowerCase()}`;
+function docIdFor(id) {
+  // Firestore interdit certains caractères (/) dans les ids de document.
+  return id.toLowerCase().trim().replace(/\//g, "-");
 }
 
 export default function App() {
@@ -37,30 +40,41 @@ export default function App() {
   const [urgent, setUrgent] = useState(null);
   const [error, setError] = useState("");
   const [storageWarning, setStorageWarning] = useState(false);
+  const [loggingIn, setLoggingIn] = useState(false);
+  const [syncing, setSyncing] = useState(false);
   const inputRef = useRef(null);
 
-  function handleLogin(e) {
+  async function handleLogin(e) {
     e.preventDefault();
     const clean = pseudoInput.trim();
     if (!clean) return;
     setStorageWarning(false);
+    setLoggingIn(true);
     try {
-      const raw = window.localStorage.getItem(storageKeyFor(clean));
-      setTasks(raw ? JSON.parse(raw) : []);
+      await ensureSignedIn();
+      const snap = await getDoc(doc(db, "taches", docIdFor(clean)));
+      setTasks(snap.exists() ? snap.data().tasks || [] : []);
+      setIdentifiant(clean);
     } catch {
       setTasks([]);
       setStorageWarning(true);
+      setIdentifiant(clean);
+    } finally {
+      setLoggingIn(false);
     }
-    setIdentifiant(clean);
   }
 
-  function persist(next) {
+  async function persist(next) {
     setTasks(next);
     if (!identifiant) return;
+    setSyncing(true);
     try {
-      window.localStorage.setItem(storageKeyFor(identifiant), JSON.stringify(next));
+      await setDoc(doc(db, "taches", docIdFor(identifiant)), { tasks: next });
+      setStorageWarning(false);
     } catch {
       setStorageWarning(true);
+    } finally {
+      setSyncing(false);
     }
   }
 
@@ -129,16 +143,16 @@ export default function App() {
           />
           <button
             type="submit"
-            disabled={!pseudoInput.trim()}
+            disabled={!pseudoInput.trim() || loggingIn}
             className="mt-4 w-full rounded-lg py-3 font-semibold transition disabled:opacity-40"
             style={{ background: CORAL, color: "#FFFFFF" }}
           >
-            Continuer 🚀
+            {loggingIn ? "Connexion..." : "Continuer 🚀"}
           </button>
           <p className="mt-4 text-xs leading-relaxed" style={{ color: "#A6ADB0" }}>
             Ce n'est pas un mot de passe : c'est un nom qui sépare tes tâches
-            de celles d'un autre identifiant, sauvegardé dans ce navigateur.
-            Sur un autre appareil ou navigateur, tu repartiras à zéro.
+            de celles d'un autre identifiant. Elles sont sauvegardées en ligne,
+            donc accessibles avec le même identifiant sur n'importe quel appareil.
           </p>
         </form>
       </div>
@@ -167,9 +181,14 @@ export default function App() {
 
         {storageWarning && (
           <p className="mt-3 text-xs" style={{ color: "#FFE8B8" }}>
-            ⚠️ La sauvegarde locale n'a pas pu être confirmée — tes tâches
-            restent visibles ici mais pourraient ne pas être conservées après
-            fermeture de l'onglet.
+            ⚠️ La synchronisation en ligne n'a pas pu être confirmée — tes
+            tâches restent visibles ici mais pourraient ne pas être
+            sauvegardées sur le serveur.
+          </p>
+        )}
+        {syncing && !storageWarning && (
+          <p className="mt-3 text-xs" style={{ color: ON_AZURE_MUTED }}>
+            💾 Sauvegarde en ligne...
           </p>
         )}
 
